@@ -26,6 +26,9 @@ import optimization
 import tokenization
 import tensorflow as tf
 
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 flags = tf.flags
 
 FLAGS = flags.FLAGS
@@ -372,6 +375,44 @@ class ColaProcessor(DataProcessor):
       examples.append(
           InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
     return examples
+
+
+class ProductTagProcessor(DataProcessor):
+
+    def get_labels(self):
+        return ['0', '1']
+
+    def get_test_examples(self, data_dir):
+        file_path = os.path.join(data_dir, 'test.csv')
+        df_test = pd.read_csv(file_path)
+        examples = []
+        for index, row in df_test.iterrows():
+            guid = 'test-%d' % index
+            text = tokenization.convert_to_unicode(str(row[2]))
+            label = str(row[-1])
+            examples.append(InputExample(guid=guid, text_a=text, label=label))
+        return examples
+
+    def get_dev_examples(self, data_dir):
+        examples = []
+        for index, row in self.df_dev.iterrows():
+            guid = 'dev-%d' % index
+            text = tokenization.convert_to_unicode(str(row[2]))
+            label = str(row[-1])
+            examples.append(InputExample(guid=guid, text_a=text, label=label))
+        return examples
+
+    def get_train_examples(self, data_dir):
+        file_path = os.path.join(data_dir, 'data.csv')
+        df = pd.read_csv(file_path)
+        df_train, self.df_dev = train_test_split(df, test_size=0.2)
+        examples = []
+        for index, row in df_train.iterrows():
+            guid = 'train-%d' % index  # 索引
+            text = tokenization.convert_to_unicode(str(row[2]))
+            label = str(row[-1])
+            examples.append(InputExample(guid=guid, text_a=text, label=label))
+        return examples
 
 
 def convert_single_example(ex_index, example, label_list, max_seq_length,
@@ -788,6 +829,7 @@ def main(_):
       "mnli": MnliProcessor,
       "mrpc": MrpcProcessor,
       "xnli": XnliProcessor,
+      "product-tag": ProductTagProcessor,
   }
 
   tokenization.validate_case_matches_checkpoint(FLAGS.do_lower_case,
