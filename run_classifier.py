@@ -378,6 +378,7 @@ class ColaProcessor(DataProcessor):
 
 
 class ProductTagProcessor(DataProcessor):
+    df_dev = None
 
     def get_labels(self):
         return ['0', '1']
@@ -394,8 +395,13 @@ class ProductTagProcessor(DataProcessor):
         return examples
 
     def get_dev_examples(self, data_dir):
+        if self.df_dev is None:
+            file_path = os.path.join(data_dir, 'eval.csv')
+            df_dev = pd.read_csv(file_path)
+        else:
+            df_dev = self.df_dev
         examples = []
-        for index, row in self.df_dev.iterrows():
+        for index, row in df_dev.iterrows():
             guid = 'dev-%d' % index
             text = tokenization.convert_to_unicode(str(row[2]))
             label = str(row[-1])
