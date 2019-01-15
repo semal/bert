@@ -1,0 +1,14 @@
+../qichachaNLP/venvpy36-gpu/Scripts/python bert-cli.py \
+--task_name=product-tag \
+--do_train=false \
+--do_eval=false \
+--do_predict=true \
+--data_dir=./data/tag-ggyx \
+--vocab_file=./data/pretrain-model/chinese_L-12_H-768_A-12/vocab.txt \
+--bert_config_file=./data/pretrain-model/chinese_L-12_H-768_A-12/bert_config.json \
+--init_checkpoint=./data/pretrain-model/chinese_L-12_H-768_A-12/bert_model.ckpt \
+--max_seq_length=128 \
+--train_batch_size=16 \
+--learning_rate=5e-5 \
+--num_train_epochs=1.0 \
+--output_dir=./data/output
